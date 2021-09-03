@@ -1,0 +1,13 @@
+.hero_header__logo{
+    box-sizing: border-box;
+    height: 150px;
+    background-color:rgba(0, 0, 0,.6);
+    padding: 20px;
+    text-align: center;
+    border: 1px solid white;
+    border-radius: 10px;
+}
+
+.hero_header__logo-img{
+    height: 100%;
+}
