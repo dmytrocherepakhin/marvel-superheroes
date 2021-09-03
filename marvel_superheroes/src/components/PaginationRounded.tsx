@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Pagination from '@material-ui/lab/Pagination';
+import { PaginationProps } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -23,7 +24,11 @@ const useStyles = makeStyles((theme) =>
     }),
 );
 
-export default function PaginationRounded(props: any): JSX.Element {
+type IProps = {
+    setCurrentPage(page: number): void
+}
+
+export default function PaginationRounded(props: PaginationProps & IProps): JSX.Element {
     const classes = useStyles();
     const checkedPage = (event: React.ChangeEvent<unknown>, page: number) => {
         props.setCurrentPage(page)
@@ -40,5 +45,3 @@ export default function PaginationRounded(props: any): JSX.Element {
         </div>
     );
 }
-
-
