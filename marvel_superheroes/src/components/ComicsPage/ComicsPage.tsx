@@ -72,12 +72,12 @@ class ComicsPage extends React.Component<IProps, IState> {
 
     async componentDidMount(): Promise<void> {
         this.setState({ progresBar: true });
-        const requestHero = await getComicsHero(this.props);
-        const request = await getComics(this.state, this.props);
+        const ComicsHeroResult = await getComicsHero(this.props);
+        const comicsResult = await getComics(this.state, this.props);
         this.setState({
-            heroName: requestHero.data.data.results[0].name,
-            comics: request.data.data.results,
-            totalOfItems: request.data.data.total,
+            heroName: ComicsHeroResult.data.data.results[0].name,
+            comics: comicsResult.data.data.results,
+            totalOfItems: comicsResult.data.data.total,
             progresBar: false
         });
     }
@@ -85,18 +85,20 @@ class ComicsPage extends React.Component<IProps, IState> {
     async componentDidUpdate(prevProps: IProps, prevState: IState): Promise<void> {
         if (this.props.location !== prevProps.location || this.state.currentPage !== prevState.currentPage) {
             this.setState({ progresBar: true });
-            const requestHero = await getComicsHero(this.props);
-            const request = await getComics(this.state, this.props);
+            const ComicsHeroResult = await getComicsHero(this.props);
+            const comicsResult = await getComics(this.state, this.props);
             this.setState({
-                heroName: requestHero.data.data.results[0].name,
-                comics: request.data.data.results,
-                totalOfItems: request.data.data.total,
+                heroName: ComicsHeroResult.data.data.results[0].name,
+                comics: comicsResult.data.data.results,
+                totalOfItems: comicsResult.data.data.total,
                 progresBar: false
             });
         }
     }
 
     render(): JSX.Element {
+        const queryStringParse = queryString.parse(this.props.location.search);
+        const pageInAddressBar = queryStringParse.page?.toString();
 
         return (
             <div className='comics_main'>
@@ -109,7 +111,7 @@ class ComicsPage extends React.Component<IProps, IState> {
                 <PaginationRounded
                     count={Math.ceil((this.state.totalOfItems) / 4)}
                     setCurrentPage={this.setCurrentPage}
-                    page={this.state.currentPage}
+                    page={pageInAddressBar ? parseInt(pageInAddressBar) : this.state.currentPage}
                 />
             </div>
         )

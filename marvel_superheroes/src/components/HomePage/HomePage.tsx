@@ -75,11 +75,12 @@ class HomePage extends React.Component<IProps, IState> {
     }
 
     searchBarHandleSubmit = (changeInputState: boolean, nameStartsWith: string, changeSelectState: boolean, orderBy: string): void => {
-        const queryIsExist = queryString.parse(this.props.location.search).query;
-        const sortIsExist = queryString.parse(this.props.location.search).sort;
+        const locationSearch = queryString.parse(this.props.location.search);
+        const queryIsExist = locationSearch.query;
+        const sortIsExist = locationSearch.sort;
 
-        const query = changeInputState ? nameStartsWith : ((!changeInputState && queryIsExist) ? (queryIsExist?.toString()) : '');
-        const sort = (changeSelectState) ? (orderBy) : ((!changeSelectState && sortIsExist) ? (sortIsExist?.toString()) : 'name');
+        const query = changeInputState ? nameStartsWith : (!changeInputState && queryIsExist ? queryIsExist?.toString() : '');
+        const sort = changeSelectState ? orderBy : (!changeSelectState && sortIsExist ? sortIsExist?.toString() : 'name');
 
         this.addressBarMaker(query, sort, null);
         this.setState({
@@ -91,10 +92,10 @@ class HomePage extends React.Component<IProps, IState> {
 
     async componentDidMount(): Promise<void> {
         this.setState({ progressBar: true })
-        const request = await getHeroes(this.state, this.props);
+        const heroesResult = await getHeroes(this.state, this.props);
         this.setState({
-            heroes: request.data.data.results,
-            totalOfItems: request.data.data.total,
+            heroes: heroesResult.data.data.results,
+            totalOfItems: heroesResult.data.data.total,
             progressBar: false
         });
     }
@@ -102,10 +103,10 @@ class HomePage extends React.Component<IProps, IState> {
     async componentDidUpdate(prevProps: IProps, prevState: IState): Promise<void> {
         if (this.props.location !== prevProps.location || this.state.offset !== prevState.offset) {
             this.setState({ progressBar: true })
-            const request = await getHeroes(this.state, this.props);
+            const heroesResult = await getHeroes(this.state, this.props);
             this.setState({
-                heroes: request.data.data.results,
-                totalOfItems: request.data.data.total,
+                heroes: heroesResult.data.data.results,
+                totalOfItems: heroesResult.data.data.total,
                 progressBar: false
             });
         }
@@ -116,6 +117,7 @@ class HomePage extends React.Component<IProps, IState> {
         const queryStringParse = queryString.parse(this.props.location.search);
         const query = queryStringParse.query?.toString();
         const sort = queryStringParse.sort?.toString();
+        const pageInAddressBar = queryStringParse.page?.toString();
 
         return (
             <div className='hero_main'>
@@ -130,7 +132,7 @@ class HomePage extends React.Component<IProps, IState> {
                 <PaginationRounded
                     count={Math.ceil((this.state.totalOfItems) / 4)}
                     setCurrentPage={this.setCurrentPage}
-                    page={this.state.currentPage}
+                    page={pageInAddressBar ? parseInt(pageInAddressBar) : this.state.currentPage}
                 />
             </div>
         )
