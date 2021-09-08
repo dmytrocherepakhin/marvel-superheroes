@@ -8,7 +8,6 @@ interface IProps {
 
 interface IState {
     heroes: IHero[];
-
 }
 
 class HeroList extends React.Component<IProps, IState> {
@@ -20,7 +19,7 @@ class HeroList extends React.Component<IProps, IState> {
     render(): JSX.Element {
         return (
             <div className='hero_heroes' >
-                {this.props.heroes.map((item, index) => <Hero key={item.id} hero={this.props.heroes[index]} />)}
+                {this.props.heroes.map((item) => <Hero key={item.id} hero={item} />)}
             </div>
         )
     }

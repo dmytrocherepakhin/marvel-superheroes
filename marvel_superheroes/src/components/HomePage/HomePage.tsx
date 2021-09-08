@@ -2,12 +2,12 @@ import React from "react";
 import HeroList from "../HeroList/HeroList";
 import Header from "../Header/Header";
 import './HomePage.css';
-import axios from "axios";
 import ProgressBarIndeterminate from '../ProgressBarIndeterminate';
 import queryString from 'query-string';
 import { RouteComponentProps } from "react-router";
 import HeroSearchBar from "../HeroSearchBar/HeroSearchBar";
 import PaginationRounded from '../PaginationRounded';
+import { getHeroes } from "../api";
 
 export interface IHero {
     id: number,
@@ -19,17 +19,20 @@ export interface IHero {
 
 type IProps = RouteComponentProps;
 
-interface IState {
-    heroes: IHero[],
+export interface IGetHeroes {
     offset: number,
     nameStartsWith: string,
-    totalOfItems: number,
     orderBy: string,
     limit: number,
+    progressBar: boolean,
+}
+
+interface IState extends IGetHeroes {
+    heroes: IHero[],
+    totalOfItems: number,
     changeInputState: boolean,
     changeSelectState: boolean,
     currentPage: number,
-    progressBar: boolean,
 }
 
 class HomePage extends React.Component<IProps, IState> {
@@ -52,13 +55,15 @@ class HomePage extends React.Component<IProps, IState> {
     }
 
     addressBarMaker = (queryArg: string | undefined, sortArg: string | undefined, pageArg: number | null): void => {
-        const query = queryArg ? queryArg : (queryString.parse(this.props.location.search).query ? queryString.parse(this.props.location.search).query?.toString() : '');
-        const sort = sortArg ? sortArg : (queryString.parse(this.props.location.search).sort ? queryString.parse(this.props.location.search).sort?.toString() : '');
-        const page = pageArg ? pageArg : (queryString.parse(this.props.location.search).page ? queryString.parse(this.props.location.search).page : null);
+        const { query, sort, page } = queryString.parse(this.props.location.search);
+        const newQuery = queryArg ? queryArg : (query ? query?.toString() : '');
+        const newSort = sortArg ? sortArg : (sort ? sort?.toString() : '');
+        const newPage = pageArg ? pageArg : (page ? page : null);
 
-        this.props.history.push('?' + (query ? 'query=' + query : '') + (sort && query ? '&sort=' + sort : (sort ? 'sort=' + sort : '')) + (((sort || query) && page) ? '&page=' + page : (page ? 'page=' + page : '')));
-
-        console.log('?' + (query ? ('query=' + query) : '') + (sort && query ? ('&sort=' + sort) : (sort ? ('sort=' + sort) : '')) + (((sort || query) && page) ? ('&page=' + page) : (page ? ('page=' + page) : '')))
+        const queryData = newQuery ? 'query=' + newQuery : '';
+        const sortData = newSort && newQuery ? '&sort=' + newSort : (newSort ? 'sort=' + newSort : '');
+        const pagedata = ((newSort || newQuery) && newPage) ? ('&page=' + newPage) : (newPage ? 'page=' + newPage : '');
+        this.props.history.push('?' + queryData + sortData + pagedata);
     }
 
     setCurrentPage = (currentPage: number): void => {
@@ -70,10 +75,11 @@ class HomePage extends React.Component<IProps, IState> {
     }
 
     searchBarHandleSubmit = (changeInputState: boolean, nameStartsWith: string, changeSelectState: boolean, orderBy: string): void => {
+        const queryIsExist = queryString.parse(this.props.location.search).query;
+        const sortIsExist = queryString.parse(this.props.location.search).sort;
 
-        const query = changeInputState ? nameStartsWith : ((!changeInputState && queryString.parse(this.props.location.search).query?.toString()) ? (queryString.parse(this.props.location.search).query?.toString()) : '');
-
-        const sort = (changeSelectState) ? (orderBy) : ((!changeSelectState && queryString.parse(this.props.location.search).sort) ? (queryString.parse(this.props.location.search).sort?.toString()) : 'name');
+        const query = changeInputState ? nameStartsWith : ((!changeInputState && queryIsExist) ? (queryIsExist?.toString()) : '');
+        const sort = (changeSelectState) ? (orderBy) : ((!changeSelectState && sortIsExist) ? (sortIsExist?.toString()) : 'name');
 
         this.addressBarMaker(query, sort, null);
         this.setState({
@@ -83,57 +89,33 @@ class HomePage extends React.Component<IProps, IState> {
         })
     }
 
-    dataRequest = (): void => {
-        const limit = this.state.limit;
-
+    async componentDidMount(): Promise<void> {
         this.setState({ progressBar: true })
-        let nameStartsWith = this.state.nameStartsWith;
-        let orderBy = this.state.orderBy;
-        let offset = this.state.offset;
-        const query = queryString.parse(this.props.location.search).query;
-        const sort = queryString.parse(this.props.location.search).sort;
-        const page = queryString.parse(this.props.location.search).page;
-
-        if (query) {
-            nameStartsWith = "nameStartsWith=" + query
-        }
-        if (sort) {
-            orderBy = sort.toString()
-        }
-        if (page) { offset = (parseInt(page.toString()) - 1) * 4 }
-
-        const url = `https://gateway.marvel.com/v1/public/characters?${nameStartsWith}&limit=${limit}&offset=${offset}&orderBy=${orderBy}&apikey=509a45843dd4b9f38128cf260158ab88`;
-
-        axios
-            .get(url)
-            .then((request) => {
-                if (request.status === 200) {
-                    this.setState({
-                        heroes: request.data.data.results,
-                        totalOfItems: request.data.data.total,
-                        progressBar: false
-                    });
-                }
-            })
-            .catch();
+        const request = await getHeroes(this.state, this.props);
+        this.setState({
+            heroes: request.data.data.results,
+            totalOfItems: request.data.data.total,
+            progressBar: false
+        });
     }
 
-    componentDidMount(): void {
-        this.setState({ progressBar: true })
-        this.dataRequest();
-    }
-
-    componentDidUpdate(prevProps: IProps, prevState: IState): void {
+    async componentDidUpdate(prevProps: IProps, prevState: IState): Promise<void> {
         if (this.props.location !== prevProps.location || this.state.offset !== prevState.offset) {
             this.setState({ progressBar: true })
-            this.dataRequest();
+            const request = await getHeroes(this.state, this.props);
+            this.setState({
+                heroes: request.data.data.results,
+                totalOfItems: request.data.data.total,
+                progressBar: false
+            });
         }
     }
 
     render(): JSX.Element {
-        const heroes = { heroes: this.state.heroes }
-        const query = queryString.parse(this.props.location.search).query?.toString();
-        const sort = queryString.parse(this.props.location.search).sort?.toString();
+        const heroes = { heroes: this.state.heroes };
+        const queryStringParse = queryString.parse(this.props.location.search);
+        const query = queryStringParse.query?.toString();
+        const sort = queryStringParse.sort?.toString();
 
         return (
             <div className='hero_main'>

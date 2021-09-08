@@ -48,7 +48,8 @@ class HeroSearchBar extends React.Component<IProps, IState> {
 
     handleSubmit = (event: React.SyntheticEvent): void => {
         event.preventDefault();
-        this.props.searchBarHandleSubmit(this.state.changeInputState, this.state.nameStartsWith, this.state.changeSelectState, this.state.orderBy);
+        const { changeInputState, nameStartsWith, changeSelectState, orderBy } = this.state;
+        this.props.searchBarHandleSubmit(changeInputState, nameStartsWith, changeSelectState, orderBy);
         this.setState({
             changeInputState: false,
             changeSelectState: false,
@@ -57,10 +58,20 @@ class HeroSearchBar extends React.Component<IProps, IState> {
 
     render(): JSX.Element {
 
-        let inputValue = '';
-        let selectValue = 'name';
-        if (this.state.changeInputState) { inputValue = this.state.nameStartsWith } else if (this.props.query) { inputValue = this.props.query }
-        if (this.state.changeSelectState) { selectValue = this.state.orderBy } else if (this.props.sort) { selectValue = this.props.sort }
+        let inputValue = this.state.nameStartsWith;
+        let selectValue = this.state.orderBy;
+
+        if (this.state.changeInputState) {
+            inputValue = this.state.nameStartsWith
+        } else if (this.props.query) {
+            inputValue = this.props.query
+        }
+
+        if (this.state.changeSelectState) {
+            selectValue = this.state.orderBy
+        } else if (this.props.sort) {
+            selectValue = this.props.sort
+        }
 
         return (
             <div className='hero_seach'>

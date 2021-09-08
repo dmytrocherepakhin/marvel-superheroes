@@ -46,14 +46,13 @@
     text-align: center;
     cursor: pointer;
     transition: all .3s;
-        color: white;
+    color: white;
 }
 
 .hero_item__avatar-img{
     height: 100%;
     width: 100%;
     color: white;
-    
 }
 
 .hero_item__btn:hover{

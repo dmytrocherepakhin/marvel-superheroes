@@ -7,14 +7,13 @@
     padding: 15px;
     border: 1px solid white;
     border-radius: 10px;
-    
 }
 
 .hero_search__input{
     box-sizing: border-box;
     display: block;
     width: 50%;
-    border: 1px solid white;
+    border: inherit;
     border-radius: 5px;
     height: 40px;
     font-size: 18px;
@@ -25,7 +24,7 @@
     display: block;
     width: 150px;
     height: 40px;
-    border: 1px solid white;
+    border: inherit;
     border-radius: 5px;
     margin: 0 15px;
     font-size: 14px;
@@ -37,7 +36,7 @@
     display: block;
     width: 150px;
     height: 40px;
-    border: 1px solid white;
+    border: inherit;
     border-radius: 5px;
     font-size: 14px;
     font-weight: bold;
