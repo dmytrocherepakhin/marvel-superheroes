@@ -7,25 +7,39 @@ import { IComicsPops } from "./ComicsPage/ComicsPage";
 
 const baseUrl = 'https://gateway.marvel.com';
 
-
 export async function getHeroes(requestData: IGetHeroes, props: RouteComponentProps): Promise<AxiosResponse> {
     const limit = requestData.limit;
-    let nameStartsWith = requestData.nameStartsWith;
-    let orderBy = requestData.orderBy;
-    let offset = requestData.offset;
+    const orderBy = requestData.orderBy;
+    const offset = requestData.offset;
     const { query, sort, page } = queryString.parse(props.location.search);
 
+    type Params = {
+        nameStartsWith?: string,
+        limit: number,
+        offset: number,
+        orderBy: string,
+        apikey: string | undefined,
+    }
+
+    const params: Params = {
+        limit: limit,
+        offset: offset,
+        orderBy: orderBy,
+        apikey: process.env.REACT_APP_API_KEY,
+    }
+
     if (query) {
-        nameStartsWith = "nameStartsWith=" + query
+        params.nameStartsWith = query.toString();
     }
     if (sort) {
-        orderBy = sort.toString()
+        params.orderBy = sort.toString();
     }
-    if (page) { offset = (parseInt(page.toString()) - 1) * 4 }
+    if (page) {
+        params.offset = (parseInt(page.toString()) - 1) * 4
+    }
+    const url = `${baseUrl}/v1/public/characters`;
 
-    const url = `${baseUrl}/v1/public/characters?${nameStartsWith}&limit=${limit}&offset=${offset}&orderBy=${orderBy}&apikey=${process.env.REACT_APP_API_KEY}`;
-
-    const requestHeroes = await axios.get(url)
+    const requestHeroes = await axios.get(url, { params })
     try {
         return requestHeroes;
     } catch (err) {
@@ -38,11 +52,26 @@ export async function getComics(requestData: IGetComics, props: IComicsPops): Pr
     let offset = requestData.offset;
     const page = queryString.parse(props.location.search).page;
 
-    if (page) { offset = (parseInt(page.toString()) - 1) * 4 }
+    type Params = {
+        limit: number,
+        offset: number,
+        apikey: string | undefined,
+    }
 
-    const url = `${baseUrl}:443/v1/public/characters/${props.match.params.id}/comics?limit=${limit}&offset=${offset}&apikey=${process.env.REACT_APP_API_KEY}`;
+    const params: Params = {
+        limit: limit,
+        offset: offset,
+        apikey: process.env.REACT_APP_API_KEY,
+    }
 
-    const requestComics = await axios.get(url)
+    if (page) {
+        offset = (parseInt(page.toString()) - 1) * 4
+    }
+
+    const url = `${baseUrl}:443/v1/public/characters/${props.match.params.id}/comics`
+    // const url = `${baseUrl}:443/v1/public/characters/${props.match.params.id}/comics?limit=${limit}&offset=${offset}&apikey=${process.env.REACT_APP_API_KEY}`;
+
+    const requestComics = await axios.get(url, { params })
     try {
         return requestComics;
     } catch (err) {
@@ -51,9 +80,13 @@ export async function getComics(requestData: IGetComics, props: IComicsPops): Pr
 }
 
 export async function getComicsHero(props: IComicsPops): Promise<AxiosResponse> {
-    const urlHero = `${baseUrl}:443/v1/public/characters/${props.match.params.id}?apikey=${process.env.REACT_APP_API_KEY}`;
+    const urlHero = `${baseUrl}:443/v1/public/characters/${props.match.params.id}`;
 
-    const requestComicsHero = await axios.get(urlHero)
+    const requestComicsHero = await axios.get(urlHero, {
+        params: {
+            apikey: process.env.REACT_APP_API_KEY
+        }
+    })
     try {
         return requestComicsHero;
     } catch (err) {
