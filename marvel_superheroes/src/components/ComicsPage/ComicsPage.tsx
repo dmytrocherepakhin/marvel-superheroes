@@ -70,7 +70,7 @@ class ComicsPage extends React.Component<IProps, IState> {
         this.addressBarMaker(currentPage);
     }
 
-    async componentDidMount(): Promise<void> {
+    makeRequest = async (): Promise<void> => {
         this.setState({ progresBar: true });
         const ComicsHeroResult = await getComicsHero(this.props);
         const comicsResult = await getComics(this.state, this.props);
@@ -82,17 +82,13 @@ class ComicsPage extends React.Component<IProps, IState> {
         });
     }
 
+    async componentDidMount(): Promise<void> {
+        this.makeRequest()
+    }
+
     async componentDidUpdate(prevProps: IProps, prevState: IState): Promise<void> {
         if (this.props.location !== prevProps.location || this.state.currentPage !== prevState.currentPage) {
-            this.setState({ progresBar: true });
-            const ComicsHeroResult = await getComicsHero(this.props);
-            const comicsResult = await getComics(this.state, this.props);
-            this.setState({
-                heroName: ComicsHeroResult.data.data.results[0].name,
-                comics: comicsResult.data.data.results,
-                totalOfItems: comicsResult.data.data.total,
-                progresBar: false
-            });
+            this.makeRequest()
         }
     }
 

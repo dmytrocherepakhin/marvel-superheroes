@@ -54,7 +54,7 @@ class HomePage extends React.Component<IProps, IState> {
         }
     }
 
-    addressBarMaker = (queryArg: string | undefined, sortArg: string | undefined, pageArg: number | null): void => {
+    addressBarMaker = (queryArg?: string, sortArg?: string, pageArg?: number | null): void => {
         const { query, sort, page } = queryString.parse(this.props.location.search);
         const newQuery = queryArg ? queryArg : (query ? query?.toString() : '');
         const newSort = sortArg ? sortArg : (sort ? sort?.toString() : '');
@@ -90,7 +90,7 @@ class HomePage extends React.Component<IProps, IState> {
         })
     }
 
-    async componentDidMount(): Promise<void> {
+    makeRequest = async (): Promise<void> => {
         this.setState({ progressBar: true })
         const heroesResult = await getHeroes(this.state, this.props);
         this.setState({
@@ -100,15 +100,13 @@ class HomePage extends React.Component<IProps, IState> {
         });
     }
 
+    async componentDidMount(): Promise<void> {
+        this.makeRequest()
+    }
+
     async componentDidUpdate(prevProps: IProps, prevState: IState): Promise<void> {
         if (this.props.location !== prevProps.location || this.state.offset !== prevState.offset) {
-            this.setState({ progressBar: true })
-            const heroesResult = await getHeroes(this.state, this.props);
-            this.setState({
-                heroes: heroesResult.data.data.results,
-                totalOfItems: heroesResult.data.data.total,
-                progressBar: false
-            });
+            this.makeRequest()
         }
     }
 
