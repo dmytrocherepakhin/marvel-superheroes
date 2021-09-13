@@ -1,0 +1,16 @@
+.hero_main{
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.paginationWrapper{
+    box-sizing: border-box;
+    margin-top: 15px;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

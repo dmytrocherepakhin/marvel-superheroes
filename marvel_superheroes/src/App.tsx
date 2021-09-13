@@ -1,16 +1,22 @@
 import React from 'react';
 import './App.css';
-import ComicsMainWindow from './components/ComicsMainWindow';
-import HeroMainWindow from './components/HeroMainWindow';
+import ComicsPage from './components/ComicsPage/ComicsPage';
+import HomePage from './components/HomePage/HomePage';
+import PageNotFound from './components/PageNotFound/PageNotFound';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+
 
 function App(): JSX.Element {
-
   return (
-
-    <div className="App">
-      <HeroMainWindow />
-      <ComicsMainWindow />
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <Switch>
+          <Route exact path="/" component={HomePage} />
+          <Route path="/comics/:id" component={ComicsPage} />
+          <Route component={PageNotFound} />
+        </Switch>
+      </div>
+    </BrowserRouter>
   );
 }
 

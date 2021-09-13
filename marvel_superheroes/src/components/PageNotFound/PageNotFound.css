@@ -1,0 +1,8 @@
+.pageNotFound{
+    padding: 50px;
+    margin: 50px auto;
+    width: 50%;
+    background-color: white;
+    color: red;
+    text-align: center;
+}

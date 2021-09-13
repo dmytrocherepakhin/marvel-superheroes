@@ -1,0 +1,16 @@
+.comics_main{
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.comics_main__title {
+    background-color:rgba(0, 0, 0,.6);
+    margin: 15px 0;
+    text-align: center;
+    border: 1px solid white;
+    border-radius: 10px;
+}
+
+.comics_main__title-text{
+    color: white;
+}
