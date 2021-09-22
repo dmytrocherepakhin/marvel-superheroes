@@ -7,7 +7,9 @@ import queryString from 'query-string';
 import { RouteComponentProps } from "react-router";
 import HeroSearchBar from "../HeroSearchBar/HeroSearchBar";
 import PaginationRounded from '../PaginationRounded';
-import { getHeroes } from "../api";
+import { connect } from 'react-redux'
+import { fetchHeroes, fetchHeroesSaga, hideLoader, IFetchHeroes, IFetchHeroesSaga, ILoader, ISetHeroesCurrentPage, ISetHeroesNameStartWith, ISetHeroesOrderBy, setHeroesCurrentPage, setHeroesNameStartWith, setHeroesOrderBy, showLoader } from "../../store/actions/actions";
+import { store } from "../../index";
 
 export interface IHero {
     id: number,
@@ -17,41 +19,40 @@ export interface IHero {
     path: string
 }
 
-type IProps = RouteComponentProps;
+export type IHeroProps = RouteComponentProps & IGetHeroes;
 
-export interface IGetHeroes {
-    offset: number,
-    nameStartsWith: string,
-    orderBy: string,
-    limit: number,
-    progressBar: boolean,
-}
-
-interface IState extends IGetHeroes {
+interface IGetHeroes {
     heroes: IHero[],
     totalOfItems: number,
-    changeInputState: boolean,
-    changeSelectState: boolean,
-    currentPage: number,
+    nameStartsWith: string,
+    orderBy: string,
+    progressBar: boolean,
+    currentHeroesPage: number,
+    setHeroesNameStartWith(nameStartsWith: string): ISetHeroesNameStartWith,
+    setHeroesOrderBy(orderBy: string): ISetHeroesOrderBy,
+    setHeroesCurrentPage(currentHeroesPage: number): ISetHeroesCurrentPage,
+    fetchHeroes(heroes: IHero[], totalOfItems: number): IFetchHeroes,
+    hideLoader(): ILoader,
+    showLoader(): ILoader,
+    fetchHeroesSaga(orderBy: string, currentHeroesPage: number, query: string | string[] | null, sort: string | string[] | null, page: string | string[] | null): IFetchHeroesSaga
 }
 
-class HomePage extends React.Component<IProps, IState> {
-    constructor(props: IProps) {
+export interface IHeroesState {
+    heroes: IHero[],
+    totalOfItems: number,
+    nameStartsWith: string,
+    orderBy: string,
+    currentHeroesPage: number,
+}
+
+export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>
+
+class HomePage extends React.Component<IHeroProps> {
+    constructor(props: IHeroProps) {
         super(props)
         this.searchBarHandleSubmit = this.searchBarHandleSubmit.bind(this)
         this.setCurrentPage = this.setCurrentPage.bind(this)
-        this.state = {
-            heroes: [],
-            offset: 0,
-            nameStartsWith: '',
-            totalOfItems: 0,
-            orderBy: 'name',
-            limit: 4,
-            changeInputState: false,
-            changeSelectState: false,
-            progressBar: false,
-            currentPage: 1
-        }
     }
 
     addressBarMaker = (queryArg?: string, sortArg?: string, pageArg?: number | null): void => {
@@ -66,52 +67,43 @@ class HomePage extends React.Component<IProps, IState> {
         this.props.history.push('?' + queryData + sortData + pagedata);
     }
 
-    setCurrentPage = (currentPage: number): void => {
-        this.setState({
-            currentPage: currentPage,
-            offset: ((currentPage - 1) * 4)
-        });
-        this.addressBarMaker('', '', currentPage);
+    setCurrentPage = (currentHeroesPage: number): void => {
+        this.props.setHeroesCurrentPage(currentHeroesPage);
+        this.addressBarMaker('', '', currentHeroesPage);
     }
 
-    searchBarHandleSubmit = (changeInputState: boolean, nameStartsWith: string, changeSelectState: boolean, orderBy: string): void => {
+    searchBarHandleSubmit = (nameStartsWith: string, orderBy: string): void => {
         const locationSearch = queryString.parse(this.props.location.search);
         const queryIsExist = locationSearch.query;
         const sortIsExist = locationSearch.sort;
 
-        const query = changeInputState ? nameStartsWith : (!changeInputState && queryIsExist ? queryIsExist?.toString() : '');
-        const sort = changeSelectState ? orderBy : (!changeSelectState && sortIsExist ? sortIsExist?.toString() : 'name');
+        const query = nameStartsWith !== queryIsExist ? nameStartsWith : (!nameStartsWith && queryIsExist ? queryIsExist?.toString() : '');
+        const sort = orderBy !== sortIsExist ? orderBy : sortIsExist?.toString();
 
         this.addressBarMaker(query, sort, null);
-        this.setState({
-            changeInputState: false,
-            changeSelectState: false,
-            currentPage: 1
-        })
+        if (nameStartsWith !== queryIsExist) { this.props.setHeroesNameStartWith(query) }
+        if (orderBy !== sortIsExist) { this.props.setHeroesOrderBy(sort) }
+        this.props.setHeroesCurrentPage(1)
     }
 
     makeRequest = async (): Promise<void> => {
-        this.setState({ progressBar: true })
-        const heroesResult = await getHeroes(this.state, this.props);
-        this.setState({
-            heroes: heroesResult.data.data.results,
-            totalOfItems: heroesResult.data.data.total,
-            progressBar: false
-        });
+        const { query, sort, page } = queryString.parse(this.props.location.search);
+        const orderBy = this.props.orderBy;
+        const currentHeroesPage = this.props.currentHeroesPage;
+
+        this.props.fetchHeroesSaga(orderBy, currentHeroesPage, query, sort, page)
     }
 
     async componentDidMount(): Promise<void> {
         this.makeRequest()
     }
 
-    async componentDidUpdate(prevProps: IProps, prevState: IState): Promise<void> {
-        if (this.props.location !== prevProps.location || this.state.offset !== prevState.offset) {
-            this.makeRequest()
-        }
+    async componentDidUpdate(prevProps: IHeroProps): Promise<void> {
+        if (this.props.location !== prevProps.location || this.props.currentHeroesPage !== prevProps.currentHeroesPage) { this.makeRequest(); }
     }
 
     render(): JSX.Element {
-        const heroes = { heroes: this.state.heroes };
+        const heroes = { heroes: this.props.heroes };
         const queryStringParse = queryString.parse(this.props.location.search);
         const query = queryStringParse.query?.toString();
         const sort = queryStringParse.sort?.toString();
@@ -125,16 +117,40 @@ class HomePage extends React.Component<IProps, IState> {
                     sort={sort ? sort : null}
                     searchBarHandleSubmit={this.searchBarHandleSubmit}
                 />
-                {this.state.progressBar ? <ProgressBarIndeterminate /> : <div style={{ height: '8px' }} />}
+                {this.props.progressBar ? <ProgressBarIndeterminate /> : <div style={{ height: '8px' }} />}
                 <HeroList {...heroes} />
                 <PaginationRounded
-                    count={Math.ceil((this.state.totalOfItems) / 4)}
+                    count={Math.ceil((this.props.totalOfItems) / 4)}
                     setCurrentPage={this.setCurrentPage}
-                    page={pageInAddressBar ? parseInt(pageInAddressBar) : this.state.currentPage}
+                    page={pageInAddressBar ? parseInt(pageInAddressBar) : this.props.currentHeroesPage}
                 />
             </div>
         )
     }
 }
 
-export default HomePage
+const mapStateToProps = (state: RootState) => {
+    return {
+        nameStartsWith: state.heroesReducer.nameStartsWith,
+        orderBy: state.heroesReducer.orderBy,
+        currentHeroesPage: state.heroesReducer.currentHeroesPage,
+        progressBar: state.loaderReducer.progressBar,
+        heroes: state.heroesReducer.heroes,
+        totalOfItems: state.heroesReducer.totalOfItems
+    };
+};
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+    return {
+        setHeroesNameStartWith: (nameStartsWith: string) => dispatch(setHeroesNameStartWith(nameStartsWith)),
+        setHeroesOrderBy: (orderBy: string) => dispatch(setHeroesOrderBy(orderBy)),
+        setHeroesCurrentPage: (currentHeroesPage: number) => dispatch(setHeroesCurrentPage(currentHeroesPage)),
+        fetchHeroes: (heroes: IHero[], totalOfItems: number) => dispatch(fetchHeroes(heroes, totalOfItems)),
+        showLoader: () => dispatch(showLoader()),
+        hideLoader: () => dispatch(hideLoader()),
+        fetchHeroesSaga: (orderBy: string, currentHeroesPage: number, query: string, sort: string | string[] | null, page: string | string[] | null) => dispatch(fetchHeroesSaga(orderBy, currentHeroesPage, query, sort, page))
+    };
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+export default connector(HomePage)

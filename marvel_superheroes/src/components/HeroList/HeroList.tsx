@@ -6,14 +6,9 @@ interface IProps {
     heroes: IHero[]
 }
 
-interface IState {
-    heroes: IHero[];
-}
-
-class HeroList extends React.Component<IProps, IState> {
+class HeroList extends React.Component<IProps> {
     constructor(props: IProps) {
         super(props)
-        this.state = { heroes: [] }
     }
 
     render(): JSX.Element {

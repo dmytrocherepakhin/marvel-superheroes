@@ -5,9 +5,7 @@ interface IProps {
     query: string | null,
     sort: string | null,
     searchBarHandleSubmit(
-        changeInputState: boolean,
         nameStartsWith: string,
-        changeSelectState: boolean,
         orderBy: string
     ): void
 }
@@ -48,8 +46,8 @@ class HeroSearchBar extends React.Component<IProps, IState> {
 
     handleSubmit = (event: React.SyntheticEvent): void => {
         event.preventDefault();
-        const { changeInputState, nameStartsWith, changeSelectState, orderBy } = this.state;
-        this.props.searchBarHandleSubmit(changeInputState, nameStartsWith, changeSelectState, orderBy);
+        const { nameStartsWith, orderBy } = this.state;
+        this.props.searchBarHandleSubmit(nameStartsWith, orderBy);
         this.setState({
             changeInputState: false,
             changeSelectState: false,
@@ -57,7 +55,6 @@ class HeroSearchBar extends React.Component<IProps, IState> {
     }
 
     render(): JSX.Element {
-
         let inputValue = this.state.nameStartsWith;
         let selectValue = this.state.orderBy;
 

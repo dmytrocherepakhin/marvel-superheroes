@@ -6,10 +6,11 @@ import ProgressBarIndeterminate from '../ProgressBarIndeterminate';
 import PaginationRounded from '../PaginationRounded';
 import queryString from 'query-string';
 import { RouteComponentProps } from "react-router-dom";
-import { getComics } from '../api'
-import { getComicsHero } from '../api'
+import { connect } from 'react-redux'
+import { fetchComics, fetchComicsHero, fetchComicsSaga, hideLoader, IFetchComics, IFetchComicsHero, IFetchComicsSaga, ILoader, ISetComicsCurrentPage, setComicsCurrentPage, showLoader } from "../../store/actions/actions";
+import { AppDispatch, RootState } from "../HomePage/HomePage";
 
-type IProps = {
+export type IComicsPops = {
     match: {
         params: {
             id: number
@@ -17,9 +18,26 @@ type IProps = {
     },
     location: { search: string },
     history: RouteComponentProps["history"],
+    currentComicsPage: number,
+    progressBar: boolean,
+    heroName: string,
+    comics: IComics[],
+    totalOfItems: number,
+    setComicsCurrentPage(currentComicsPage: number): ISetComicsCurrentPage,
+    fetchComics(comics: IComics[], totalOfItems: number): IFetchComics,
+    fetchComicsHero(heroName: string): IFetchComicsHero,
+    hideLoader(): ILoader,
+    showLoader(): ILoader,
+    fetchComicsSaga(page: string | string[] | null, heroId: number, currentComicsPage: number): IFetchComicsSaga
 }
 
-export type IComicsPops = IProps;
+export interface IComicsState {
+    currentComicsPage: number,
+    comics: IComics[],
+    totalOfItems: number,
+    heroName: string
+}
+
 export interface IComics {
     path: string,
     description: string,
@@ -28,32 +46,10 @@ export interface IComics {
     thumbnail: { path: string }
 }
 
-export interface IGetComics {
-    offset: number,
-    limit: number,
-}
-
-interface IState extends IGetComics {
-    comics: IComics[],
-    heroName: string,
-    progresBar: boolean,
-    currentPage: number,
-    totalOfItems: number
-}
-
-class ComicsPage extends React.Component<IProps, IState> {
-    constructor(props: IProps) {
+class ComicsPage extends React.Component<IComicsPops> {
+    constructor(props: IComicsPops) {
         super(props)
         this.setCurrentPage = this.setCurrentPage.bind(this)
-        this.state = {
-            comics: [],
-            heroName: '',
-            progresBar: false,
-            offset: 0,
-            limit: 4,
-            currentPage: 1,
-            totalOfItems: 0
-        }
     }
 
     addressBarMaker = (pageArg: number | null): void => {
@@ -62,32 +58,25 @@ class ComicsPage extends React.Component<IProps, IState> {
         this.props.history.push('?page=' + page);
     }
 
-    setCurrentPage = (currentPage: number): void => {
-        this.setState({
-            currentPage: currentPage,
-            offset: ((currentPage - 1) * 4)
-        });
-        this.addressBarMaker(currentPage);
+    setCurrentPage = (currentComicsPage: number): void => {
+        this.props.setComicsCurrentPage(currentComicsPage);
+        this.addressBarMaker(currentComicsPage);
     }
 
     makeRequest = async (): Promise<void> => {
-        this.setState({ progresBar: true });
-        const ComicsHeroResult = await getComicsHero(this.props);
-        const comicsResult = await getComics(this.state, this.props);
-        this.setState({
-            heroName: ComicsHeroResult.data.data.results[0].name,
-            comics: comicsResult.data.data.results,
-            totalOfItems: comicsResult.data.data.total,
-            progresBar: false
-        });
+        const page = queryString.parse(this.props.location.search).page;
+        const heroId = this.props.match.params.id;
+        const currentComicsPage = this.props.currentComicsPage;
+
+        this.props.fetchComicsSaga(page, heroId, currentComicsPage)
     }
 
     async componentDidMount(): Promise<void> {
         this.makeRequest()
     }
 
-    async componentDidUpdate(prevProps: IProps, prevState: IState): Promise<void> {
-        if (this.props.location !== prevProps.location || this.state.currentPage !== prevState.currentPage) {
+    async componentDidUpdate(prevProps: IComicsPops): Promise<void> {
+        if (this.props.location !== prevProps.location || this.props.currentComicsPage !== prevProps.currentComicsPage) {
             this.makeRequest()
         }
     }
@@ -100,18 +89,40 @@ class ComicsPage extends React.Component<IProps, IState> {
             <div className='comics_main'>
                 <Header />
                 <div className='comics_main__title'>
-                    <h1 className='comics_main__title-text'>{this.state.heroName} comics</h1>
+                    <h1 className='comics_main__title-text'>{this.props.heroName} comics</h1>
                 </div>
-                {this.state.progresBar ? <ProgressBarIndeterminate /> : <div style={{ height: '8px' }} />}
-                {this.state.comics.map((item) => <Comics key={item.id} comics={item} />)}
+                {this.props.progressBar ? <ProgressBarIndeterminate /> : <div style={{ height: '8px' }} />}
+                {this.props.comics.map((item) => <Comics key={item.id} comics={item} />)}
                 <PaginationRounded
-                    count={Math.ceil((this.state.totalOfItems) / 4)}
+                    count={Math.ceil((this.props.totalOfItems) / 4)}
                     setCurrentPage={this.setCurrentPage}
-                    page={pageInAddressBar ? parseInt(pageInAddressBar) : this.state.currentPage}
+                    page={pageInAddressBar ? parseInt(pageInAddressBar) : this.props.currentComicsPage}
                 />
             </div>
         )
     }
 }
 
-export default ComicsPage
+const mapStateToProps = (state: RootState) => {
+    return {
+        currentComicsPage: state.comicsReducer.currentComicsPage,
+        progressBar: state.loaderReducer.progressBar,
+        heroName: state.comicsReducer.heroName,
+        comics: state.comicsReducer.comics,
+        totalOfItems: state.comicsReducer.totalOfItems
+    };
+}
+
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+    return {
+        setComicsCurrentPage: (currentComicsPage: number) => dispatch(setComicsCurrentPage(currentComicsPage)),
+        fetchComics: (comics: IComics[], totalOfItems: number) => dispatch(fetchComics(comics, totalOfItems)),
+        fetchComicsHero: (heroName: string) => dispatch(fetchComicsHero(heroName)),
+        showLoader: () => dispatch(showLoader()),
+        hideLoader: () => dispatch(hideLoader()),
+        fetchComicsSaga: (page: string | string[] | null, heroId: number, currentComicsPage: number) => dispatch(fetchComicsSaga(page, heroId, currentComicsPage))
+    }
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+export default connector(ComicsPage)
