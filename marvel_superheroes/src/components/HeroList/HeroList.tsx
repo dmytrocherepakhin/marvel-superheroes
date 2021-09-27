@@ -1,23 +1,25 @@
-import React from "react";
-import Hero from "../Hero/Hero";
-import { IHero } from '../HomePage/HomePage'
+import React from "react"
+import Hero from "../Hero/Hero"
+import { IHero } from "../HomePage/HomePage"
 
 interface IProps {
-    heroes: IHero[]
+  heroes: IHero[]
 }
 
 class HeroList extends React.Component<IProps> {
-    constructor(props: IProps) {
-        super(props)
-    }
+  constructor(props: IProps) {
+    super(props)
+  }
 
-    render(): JSX.Element {
-        return (
-            <div className='hero_heroes' >
-                {this.props.heroes.map((item) => <Hero key={item.id} hero={item} />)}
-            </div>
-        )
-    }
+  render(): JSX.Element {
+    return (
+      <div className="hero_heroes">
+        {this.props.heroes.map((item) => (
+          <Hero key={item.id} hero={item} />
+        ))}
+      </div>
+    )
+  }
 }
 
 export default HeroList

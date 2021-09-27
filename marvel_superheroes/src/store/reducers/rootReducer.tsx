@@ -1,12 +1,10 @@
-import { combineReducers } from 'redux'
-import comicsReducer from './comicsReducer'
-import heroesReducer from './heroesReducer'
-import loaderReducer from './loaderReducer';
+import { combineReducers } from "redux"
+import comicsReducer from "./comicsReducer"
+import heroesReducer from "./heroesReducer"
 
 const rootReducer = combineReducers({
-    heroesReducer,
-    comicsReducer,
-    loaderReducer
-});
+  heroesReducer,
+  comicsReducer,
+})
 
 export default rootReducer
