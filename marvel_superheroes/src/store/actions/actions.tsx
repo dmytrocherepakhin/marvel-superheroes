@@ -1,5 +1,5 @@
-import { IComics } from "../../components/ComicsPage/ComicsPage"
-import { IHero } from "../../components/HomePage/HomePage"
+import { IComics } from '../../components/ComicsPage/ComicsPage';
+import { IHero } from '../../components/HomePage/HomePage';
 import {
   GET_COMICS_ERROR,
   GET_COMICS_REQUEST,
@@ -8,73 +8,73 @@ import {
   GET_HEROES_ERROR,
   GET_HEROES_REQUEST,
   GET_HEROES_SUCCESS,
-  GET_HEROES_SAGA,
-} from "../actionTypes/types"
+  GET_HEROES_SAGA
+} from '../actionTypes/types';
 
 export interface IGetHeroesSaga {
-  type: typeof GET_HEROES_SAGA
+  type: typeof GET_HEROES_SAGA;
   payload: {
-    currentHeroesPage: number
-    orderBy: string
-    nameStartsWith?: string
-  }
+    currentHeroesPage: number;
+    orderBy: string;
+    nameStartsWith?: string;
+  };
 }
 
 export interface IGetHeroesRequest {
-  type: typeof GET_HEROES_REQUEST
+  type: typeof GET_HEROES_REQUEST;
   payload: {
-    progressBar: boolean
-  }
+    progressBar: boolean;
+  };
 }
 
 export interface IGetHeroesSuccess {
-  type: typeof GET_HEROES_SUCCESS
+  type: typeof GET_HEROES_SUCCESS;
   payload: {
-    heroes: IHero[]
-    totalOfItems: number
-    progressBar: boolean
-  }
+    heroes: IHero[];
+    totalOfItems: number;
+    progressBar: boolean;
+  };
 }
 
 export interface IGetHeroesError {
-  type: typeof GET_HEROES_ERROR
+  type: typeof GET_HEROES_ERROR;
   payload: {
-    error: string
-    progressBar: boolean
-  }
+    error: string;
+    progressBar: boolean;
+  };
 }
 
 export interface IGetComicsSaga {
-  type: typeof GET_COMICS_SAGA
+  type: typeof GET_COMICS_SAGA;
   payload: {
-    heroId: number
-    currentComicsPage: number
-  }
+    heroId: number;
+    currentComicsPage: number;
+  };
 }
 
 export interface IGetComicsRequest {
-  type: typeof GET_COMICS_REQUEST
+  type: typeof GET_COMICS_REQUEST;
   payload: {
-    progressBar: boolean
-  }
+    progressBar: boolean;
+  };
 }
 
 export interface IGetComicsSuccess {
-  type: typeof GET_COMICS_SUCCESS
+  type: typeof GET_COMICS_SUCCESS;
   payload: {
-    heroName: string
-    comics: IComics[]
-    totalOfItems: number
-    progressBar: boolean
-  }
+    heroName: string;
+    comics: IComics[];
+    totalOfItems: number;
+    progressBar: boolean;
+  };
 }
 
 export interface IGetComicsError {
-  type: typeof GET_COMICS_ERROR
+  type: typeof GET_COMICS_ERROR;
   payload: {
-    error: string
-    progressBar: boolean
-  }
+    error: string;
+    progressBar: boolean;
+  };
 }
 
 export function getHeroesSaga(
@@ -87,18 +87,18 @@ export function getHeroesSaga(
     payload: {
       currentHeroesPage,
       orderBy,
-      nameStartsWith,
-    },
-  }
+      nameStartsWith
+    }
+  };
 }
 
 export function getHeroesRequest(progressBar: boolean): IGetHeroesRequest {
   return {
     type: GET_HEROES_REQUEST,
     payload: {
-      progressBar,
-    },
-  }
+      progressBar
+    }
+  };
 }
 
 export function getHeroesSuccess(
@@ -111,9 +111,9 @@ export function getHeroesSuccess(
     payload: {
       heroes,
       totalOfItems,
-      progressBar,
-    },
-  }
+      progressBar
+    }
+  };
 }
 
 export function getHeroesError(
@@ -124,9 +124,9 @@ export function getHeroesError(
     type: GET_HEROES_ERROR,
     payload: {
       error,
-      progressBar,
-    },
-  }
+      progressBar
+    }
+  };
 }
 
 export function getComicsSaga(
@@ -137,18 +137,18 @@ export function getComicsSaga(
     type: GET_COMICS_SAGA,
     payload: {
       heroId,
-      currentComicsPage,
-    },
-  }
+      currentComicsPage
+    }
+  };
 }
 
 export function getComicsRequest(progressBar: boolean): IGetComicsRequest {
   return {
     type: GET_COMICS_REQUEST,
     payload: {
-      progressBar,
-    },
-  }
+      progressBar
+    }
+  };
 }
 
 export function getComicsSuccess(
@@ -163,9 +163,9 @@ export function getComicsSuccess(
       heroName,
       comics,
       totalOfItems,
-      progressBar,
-    },
-  }
+      progressBar
+    }
+  };
 }
 export function getComicsError(
   error: string,
@@ -175,7 +175,7 @@ export function getComicsError(
     type: GET_COMICS_ERROR,
     payload: {
       error,
-      progressBar,
-    },
-  }
+      progressBar
+    }
+  };
 }

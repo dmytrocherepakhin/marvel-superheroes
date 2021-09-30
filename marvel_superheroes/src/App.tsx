@@ -1,9 +1,9 @@
-import React from "react"
-import "./App.css"
-import ComicsPage from "./components/ComicsPage/ComicsPage"
-import HomePage from "./components/HomePage/HomePage"
-import PageNotFound from "./components/PageNotFound/PageNotFound"
-import { BrowserRouter, Switch, Route } from "react-router-dom"
+import React from 'react';
+import './App.css';
+import ComicsPage from './components/ComicsPage/ComicsPage';
+import HomePage from './components/HomePage/HomePage';
+import PageNotFound from './components/PageNotFound/PageNotFound';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 function App(): JSX.Element {
   return (
@@ -16,7 +16,7 @@ function App(): JSX.Element {
         </Switch>
       </div>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

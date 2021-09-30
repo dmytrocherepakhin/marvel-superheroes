@@ -1,74 +1,74 @@
-import React from "react"
-import "./HeroSearchBar.css"
+import React from 'react';
+import './HeroSearchBar.css';
 
 interface IProps {
-  query: string | null
-  sort: string | null
-  searchBarHandleSubmit(nameStartsWith: string, orderBy: string): void
+  query: string | null;
+  sort: string | null;
+  searchBarHandleSubmit(nameStartsWith: string, orderBy: string): void;
 }
 
 interface IState {
-  nameStartsWith: string
-  orderBy: string
-  changeInputState: boolean
-  changeSelectState: boolean
+  nameStartsWith: string;
+  orderBy: string;
+  changeInputState: boolean;
+  changeSelectState: boolean;
 }
 
 class HeroSearchBar extends React.Component<IProps, IState> {
   constructor(props: IProps) {
-    super(props)
+    super(props);
     this.state = {
-      nameStartsWith: "",
-      orderBy: "name",
+      nameStartsWith: '',
+      orderBy: 'name',
       changeInputState: false,
-      changeSelectState: false,
-    }
+      changeSelectState: false
+    };
   }
 
   handleInput = (event: React.ChangeEvent): void => {
-    const target = event.target as HTMLInputElement
+    const target = event.target as HTMLInputElement;
     this.setState({
       nameStartsWith: target.value,
-      changeInputState: true,
-    })
-  }
+      changeInputState: true
+    });
+  };
 
   handleSelect = (event: React.ChangeEvent): void => {
-    const target = event.target as HTMLSelectElement
+    const target = event.target as HTMLSelectElement;
     this.setState({
       orderBy: target.value,
-      changeSelectState: true,
-    })
-  }
+      changeSelectState: true
+    });
+  };
 
   handleSubmit = (event: React.SyntheticEvent): void => {
-    event.preventDefault()
-    const { nameStartsWith, orderBy } = this.state
-    this.props.searchBarHandleSubmit(nameStartsWith, orderBy)
+    event.preventDefault();
+    const { nameStartsWith, orderBy } = this.state;
+    this.props.searchBarHandleSubmit(nameStartsWith, orderBy);
     this.setState({
       changeInputState: false,
-      changeSelectState: false,
-    })
-  }
+      changeSelectState: false
+    });
+  };
 
   render(): JSX.Element {
-    let inputValue = this.state.nameStartsWith
-    let selectValue = this.state.orderBy
+    let inputValue = this.state.nameStartsWith;
+    let selectValue = this.state.orderBy;
 
     if (this.state.changeInputState) {
-      inputValue = this.state.nameStartsWith
+      inputValue = this.state.nameStartsWith;
     } else if (this.props.query) {
-      inputValue = this.props.query
+      inputValue = this.props.query;
     } else {
-      inputValue = ""
+      inputValue = '';
     }
 
     if (this.state.changeSelectState) {
-      selectValue = this.state.orderBy
+      selectValue = this.state.orderBy;
     } else if (this.props.sort) {
-      selectValue = this.props.sort
+      selectValue = this.props.sort;
     } else {
-      selectValue = "name"
+      selectValue = 'name';
     }
 
     return (
@@ -96,8 +96,8 @@ class HeroSearchBar extends React.Component<IProps, IState> {
           </button>
         </form>
       </div>
-    )
+    );
   }
 }
 
-export default HeroSearchBar
+export default HeroSearchBar;

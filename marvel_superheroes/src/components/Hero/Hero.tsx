@@ -1,10 +1,10 @@
-import React from "react"
-import { Link } from "react-router-dom"
-import "./Hero.css"
-import { IHero } from "../HomePage/HomePage"
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Hero.css';
+import { IHero } from '../HomePage/HomePage';
 
 interface IProps {
-  hero: IHero
+  hero: IHero;
 }
 
 class Hero extends React.Component<IProps> {
@@ -15,7 +15,7 @@ class Hero extends React.Component<IProps> {
           <img
             className="hero_item__avatar-img"
             src={
-              this.props.hero.thumbnail.path + "/" + "standard_large" + ".jpg"
+              this.props.hero.thumbnail.path + '/' + 'standard_large' + '.jpg'
             }
             alt="---Hero--"
           />
@@ -25,14 +25,14 @@ class Hero extends React.Component<IProps> {
           <p>{this.props.hero.description}</p>
         </div>
         <Link
-          to={"/comics/" + this.props.hero.id}
-          style={{ textDecoration: "none" }}
+          to={'/comics/' + this.props.hero.id}
+          style={{ textDecoration: 'none' }}
         >
           <div className="hero_item__btn">See more</div>
         </Link>
       </div>
-    )
+    );
   }
 }
 
-export default Hero
+export default Hero;

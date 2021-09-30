@@ -1,14 +1,14 @@
-import React from "react"
-import Hero from "../Hero/Hero"
-import { IHero } from "../HomePage/HomePage"
+import React from 'react';
+import Hero from '../Hero/Hero';
+import { IHero } from '../HomePage/HomePage';
 
 interface IProps {
-  heroes: IHero[]
+  heroes: IHero[];
 }
 
 class HeroList extends React.Component<IProps> {
   constructor(props: IProps) {
-    super(props)
+    super(props);
   }
 
   render(): JSX.Element {
@@ -18,8 +18,8 @@ class HeroList extends React.Component<IProps> {
           <Hero key={item.id} hero={item} />
         ))}
       </div>
-    )
+    );
   }
 }
 
-export default HeroList
+export default HeroList;

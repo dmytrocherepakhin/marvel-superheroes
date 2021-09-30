@@ -6,6 +6,7 @@
     "extends": [
         "eslint:recommended",
         "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:prettier/recommended",
         "prettier"
@@ -23,14 +24,17 @@
         "@typescript-eslint"
     ],
     "rules": {
+        // "indent": [2, 2, {
+        //     "SwitchCase": 1
+        // }],
         "indent": [2, 2, {
             "SwitchCase": 1
         }],
-        "prettier/prettier": [
-            "error",
-            {
-                "endOfLine": "auto"
-            }
-        ]
+        "prettier/prettier": ["error", {
+            "singleQuote": true,
+            "trailingComma": "none",
+            "semi": true,
+            "endOfLine": "auto"
+        }]
     }
 }
