@@ -6,20 +6,14 @@ interface IProps {
   heroes: IHero[];
 }
 
-class HeroList extends React.Component<IProps> {
-  constructor(props: IProps) {
-    super(props);
-  }
-
-  render(): JSX.Element {
-    return (
-      <div className="hero_heroes">
-        {this.props.heroes.map((item) => (
-          <Hero key={item.id} hero={item} />
-        ))}
-      </div>
-    );
-  }
+function HeroList(props: IProps): JSX.Element {
+  return (
+    <div className="hero_heroes">
+      {props.heroes.map((item) => (
+        <Hero key={item.id} hero={item} />
+      ))}
+    </div>
+  );
 }
 
 export default HeroList;
