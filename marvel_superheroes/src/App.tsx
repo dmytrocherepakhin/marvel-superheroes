@@ -5,7 +5,6 @@ import HomePage from './components/HomePage/HomePage';
 import PageNotFound from './components/PageNotFound/PageNotFound';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-
 function App(): JSX.Element {
   return (
     <BrowserRouter>
